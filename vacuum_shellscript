@@ -13,7 +13,9 @@ EOF
 chown root.root /tmp/x509proxy.pem
 chmod 0400 /tmp/x509proxy.pem
 
+### This bit is still ATLAS specific
 curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --key /tmp/x509proxy.pem https://depo.gridpp.ac.uk/pool-password.cgi | base64 -d >/root/pool_password
+###
 
 # Start condor with proper config and pool_password file
 mv -f /etc/sysconfig/condor-saved /etc/sysconfig/condor
@@ -25,7 +27,6 @@ while true
 do
   echo `cut -f1-3 -d' ' /proc/loadavg` `cat /proc/uptime` >/var/spool/joboutputs/heartbeat
   date --utc +"%Y-%m-%d %H:%M:%S %Z Uploading heartbeat"
-  /usr/bin/curl --max-time 30 --location --upload-file /var/spool/joboutputs/heartbeat '##user_data_joboutputs_url##/vm-heartbeat'
   /usr/bin/curl --max-time 30 --location --upload-file /var/spool/joboutputs/heartbeat '##user_data_joboutputs_url##/heartbeat'
   date --utc +"%Y-%m-%d %H:%M:%S %Z curl returns $?"
   sleep 300
@@ -47,12 +48,14 @@ do
   if [ $? != 0 ] ; then
     echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
   else
+    ###  These bits are still ATLAS specific!
     grep 'Dispatcher response.*PandaID' /var/spool/joboutputs/*.condor.stdout >/dev/null 2>/dev/null 
     if [ $? != 0 ] ; then
       echo '300 No PanDA job to run' > /var/spool/joboutputs/shutdown_message
     else
       echo '200 Success' > /var/spool/joboutputs/shutdown_message 
     fi
+    ###
   fi
   
   # Time to upload and shutdown
