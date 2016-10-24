@@ -1,0 +1,43 @@
+  - owner: root:root
+    path: /usr/local/bin/lcg-atlas
+    permissions: '0755'
+    content: |
+        #!/bin/bash
+
+        export HOME=$(pwd)
+        export USER=$(whoami)
+        source /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/a1_grid_env.sh
+        source /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/setup-wn-example.sh
+        export VO_ATLAS_SW_DIR=/cvmfs/atlas.cern.ch/repo/sw
+        export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+        source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet
+        ATLAS_LOCAL_CERNROOT_VERSION=$(readlink ${ATLAS_LOCAL_ROOT}/root/current-SL6)
+        ROOT=${ATLAS_LOCAL_ROOT}/root/${ATLAS_LOCAL_CERNROOT_VERSION}
+        XROOTD_VERSION=$(${ROOT}/bin/root-config --config | sed 's#.*xrootd/\([^/]*\).*#\1#g')
+        VERSION=$(${ATLAS_LOCAL_ROOT_BASE}/utilities/fetchVersions.sh --name=xrootd --followSL --format=bareList | grep ${XROOTD_VERSION}-x86_64-slc6)
+        source ${ROOT}/bin/setxrd.sh ${ATLAS_LOCAL_ROOT}/xrootd/${VERSION}/v${XROOTD_VERSION}
+        curl 'http://bigpanda.cern.ch/jobs/?computingsite=##user_data_option_queue##' >/var/spool/joboutputs/`pwd|sed 's:^.*/::'`.jobs.html
+
+        $* | tee /var/spool/joboutputs/`pwd|sed 's:^.*/::'`.condor.stdout
+
+  - owner: root:root
+    path: /usr/libexec/atlval.sh
+    permissions: '0755'
+    content: |
+        #!/bin/bash
+        # Anything printed out is interpreted as a classad attribute
+        # and can be used in the START expression
+         
+        result=True
+         
+        ls /cvmfs/atlas.cern.ch/repo/sw &> /dev/null
+        if [ $? -ne 0 ];then
+        result=False
+        fi
+         
+        grep CVMFS_CACHE_BASE /etc/cvmfs/default.local &> /dev/null
+        if [ $? -ne 0 ];then
+           result=False
+        fi
+         
+        echo ATLAS_VALID = $result
