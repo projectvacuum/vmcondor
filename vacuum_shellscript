@@ -1,0 +1,81 @@
+#!/bin/sh
+if [ "$1" == "stop" ] ; then exit; fi 
+
+mkdir -p /var/spool/joboutputs
+chmod ugo+rwxt /var/spool/joboutputs/
+
+(
+cat <<EOF >/tmp/x509proxy.pem
+##user_data_option_x509_proxy##
+##user_data_file_hostcert##
+##user_data_file_hostkey##
+EOF
+chown root.root /tmp/x509proxy.pem
+chmod 0400 /tmp/x509proxy.pem
+
+curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --key /tmp/x509proxy.pem https://depo.gridpp.ac.uk/pool-password.cgi | base64 -d >/root/pool_password
+
+# Start condor with proper config and pool_password file
+mv -f /etc/sysconfig/condor-saved /etc/sysconfig/condor
+service condor restart
+
+# Put site/queue specific port number into Ganglia configuration
+AGMPORT=`python -c "import requests ; print requests.get('http://agm.cern.ch/gmond-cluster-cfg.json', timeout=60).json()['##user_data_option_queue##']['Port']"`
+if [ $? = 0 -a "$AGMPORT" != "" ] ; then
+  sed -i "s/AGM_PORT_NUMBER/$AGMPORT/" /etc/ganglia/gmond.conf
+  service gmond restart
+else
+  # Just in case
+  service gmond stop
+fi
+
+# Send a heartbeat every 5 minutes
+(
+while true
+do
+  echo `cut -f1-3 -d' ' /proc/loadavg` `cat /proc/uptime` >/var/spool/joboutputs/heartbeat
+  date --utc +"%Y-%m-%d %H:%M:%S %Z Uploading heartbeat"
+  /usr/bin/curl --max-time 30 --location --upload-file /var/spool/joboutputs/heartbeat '##user_data_joboutputs_url##/vm-heartbeat'
+  /usr/bin/curl --max-time 30 --location --upload-file /var/spool/joboutputs/heartbeat '##user_data_joboutputs_url##/heartbeat'
+  date --utc +"%Y-%m-%d %H:%M:%S %Z curl returns $?"
+  sleep 300
+done
+) >/var/log/heartbeat.log 2>&1 &
+
+# Record Condor configuration
+condor_config_val -dump >/var/spool/joboutputs/condor_config_val-dump.log
+
+# Give Condor 10 minutes to have find a job, then shutdown whenever it finishes (or now)
+(sleep 1800 ; condor_off -peaceful) &
+
+while true
+do
+  # If condor is running, then go round again after a minute
+  if ps -C condor_startd ; then sleep 60 ; continue ; fi
+  
+  grep 'Inside OsProc::JobExit' /var/log/condor/StarterLog >/dev/null 2>/dev/null
+  if [ $? != 0 ] ; then
+    echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
+  else
+    grep 'Dispatcher response.*PandaID' /var/spool/joboutputs/*.condor.stdout >/dev/null 2>/dev/null 
+    if [ $? != 0 ] ; then
+      echo '300 No PanDA job to run' > /var/spool/joboutputs/shutdown_message
+    else
+      echo '200 Success' > /var/spool/joboutputs/shutdown_message 
+    fi
+  fi
+  
+  # Time to upload and shutdown
+  cd /var/spool/joboutputs
+  cp -f /var/log/condor/* /var/log/cloud-init*.log .
+  export certHostname=`openssl x509 -in /tmp/x509proxy.pem -subject -noout | sed 's:.*/CN=\([a-z0-9.-]*\).*:\1:'`
+  for i in * ; do curl --location --upload-file "$i" '##user_data_joboutputs_url##/' ; curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --key /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/$certHostname/atlas/##user_data_space##/$HOSTNAME/##user_data_uuid##/" ; done
+
+  # Try normal shutdown
+  shutdown -h now
+  sleep 60
+  # Otherwise instant shutdown
+  echo o > /proc/sysrq-trigger
+done
+
+) >/var/spool/joboutputs/shellscript.log 2>&1 &
