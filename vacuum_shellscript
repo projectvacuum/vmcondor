@@ -19,16 +19,6 @@ curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --key /
 mv -f /etc/sysconfig/condor-saved /etc/sysconfig/condor
 service condor restart
 
-# Put site/queue specific port number into Ganglia configuration
-AGMPORT=`python -c "import requests ; print requests.get('http://agm.cern.ch/gmond-cluster-cfg.json', timeout=60).json()['##user_data_option_queue##']['Port']"`
-if [ $? = 0 -a "$AGMPORT" != "" ] ; then
-  sed -i "s/AGM_PORT_NUMBER/$AGMPORT/" /etc/ganglia/gmond.conf
-  service gmond restart
-else
-  # Just in case
-  service gmond stop
-fi
-
 # Send a heartbeat every 5 minutes
 (
 while true

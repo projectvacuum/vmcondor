@@ -11,15 +11,6 @@ bootcmd:
   - mkswap /mnt/.rw/swapfile
   - swapon /mnt/.rw/swapfile
   - sysctl vm.swappiness=1
-ganglia:
-    globals:
-        override_hostname: ##user_data_machine_hostname##
-        send_metadata_interval: 45
-    cluster: 
-        name: '"##user_data_option_queue##"'
-    udp_send_channel:
-        host: agm.cern.ch
-        port: AGM_PORT_NUMBER
 cvmfs:
     local:
         CVMFS_CACHE_BASE: /mnt/.rw/cvmfs-cache

@@ -1,5 +1,5 @@
 #  
-# Generic ATLAS Cloud Init user_data template file for use with Vacuum
+# HTCvcm: generic Cloud Init user_data template file for use with Vacuum
 # based systems (Vac,Vcycle), and containing the following 
 # ##user_data___## substitutions:
 #  
