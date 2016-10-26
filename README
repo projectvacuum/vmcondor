@@ -1,1 +1,8 @@
+VMCondor: generic Cloud Init user_data template file for use with Vacuum
+# based systems (Vac,Vcycle)
+
 Just do  make  to build the user_data file from the component files
+
+If you have experiment or VO-specific files, you can include then by
+making files with names ending in ".write_files" containing Cloud
+Config instructions for creating a file.
