@@ -80,8 +80,8 @@ write_files:
         GSI (.*) cuser1
         SSL (.*) cuser1
 #
-# Note the write_files module must be the last one in HTCvcm_cloud-config as
-# per experiment files will be appended to it and HTCvcm_cloud-config before
+# Note the write_files module must be the last one in VMCondor_cloud-config as
+# per experiment files will be appended to it and VMCondor_cloud-config before
 # including it in the multipart MIME file
 #
 # More write_files per-file sections go here ...

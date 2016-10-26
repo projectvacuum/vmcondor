@@ -1,5 +1,5 @@
 #  
-# HTCvcm: generic Cloud Init user_data template file for use with Vacuum
+# VMCondor: generic Cloud Init user_data template file for use with Vacuum
 # based systems (Vac,Vcycle), and containing the following 
 # ##user_data___## substitutions:
 #  
@@ -13,5 +13,5 @@
 # This file should normally be processed by Vac (version 0.20.0 onwards) or
 # Vcycle (0.3.0 onwards) internally. 
 # 
-# Andrew.McNab@cern.ch February 2016
+# Andrew.McNab@cern.ch October 2016
 # 
