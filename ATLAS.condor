@@ -1,0 +1,15 @@
+CONDOR_HOST: aipanda138.cern.ch
+COLLECTOR_HOST: aipanda138.cern.ch:20618
+CONDOR_ADMIN: root@aipanda138.cern.ch:20618
+ALLOW_DAEMON: 127.0.0.1, IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
+HOSTALLOW_DAEMON: IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
+USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper
+GSITE: '"##user_data_option_queue##"'
+STARTD_ATTRS: GSITE
+PRIVATE_NETWORK_INTERFACE: IPADDRESS
+PRIVATE_NETWORK_NAME: ##user_data_manager_hostname##
+STARTD_CRON_JOBLIST: $(STARTD_CRON_JOBLIST) atlval
+STARTD_CRON_ATLVAL_MODE: Periodic
+STARTD_CRON_ATLVAL_EXECUTABLE: /usr/libexec/atlval.sh
+STARTD_CRON_ATLVAL_PERIOD: 60s
+STARTD_CRON_ATLVAL_JOB_LOAD: 0.1

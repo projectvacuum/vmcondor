@@ -17,68 +17,18 @@ cvmfs:
         CVMFS_QUOTA_LIMIT: 7000
         CVMFS_REPOSITORIES: grid,atlas
         CVMFS_HTTP_PROXY: ##user_data_option_cvmfs_proxy##
-condor:
-  HOSTNAME: ##user_data_machine_hostname##
-  CONDOR_HOST: aipanda138.cern.ch
-  COLLECTOR_HOST: aipanda138.cern.ch:20618
-  CONDOR_IDS: 496.493
-  CLAIM_WORKLIFE: 0
-  CONDOR_ADMIN: root@aipanda138.cern.ch:20618
-  DEDICATED_EXECUTE_ACCOUNT_REGEXP: cuser[0-9]+
-  JAVA: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java
-  USER_JOB_WRAPPER: /usr/local/bin/lcg-atlas
-  GSITE: '"##user_data_option_queue##"'
-  STARTD_ATTRS: GSITE
-  ENABLE_SSH_TO_JOB: True
-  CERTIFICATE_MAPFILE: /etc/condor/canonical_map
-  ALLOW_DAEMON: 127.0.0.1, IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
-  HOSTALLOW_DAEMON: IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
-  EXECUTE: /scratch/condor
-  MASTER_DEBUG: D_FULLDEBUG
-  STARTER_DEBUG: D_FULLDEBUG
-  STARTD_DEBUG: D_FULLDEBUG
-  SEC_DEFAULT_AUTHENTICATION: REQUIRED
-  SEC_DEFAULT_AUTHENTICATION_METHODS: PASSWORD, GSI
-  SEC_PASSWORD_FILE: /root/pool_password
-  GSI_DELEGATION_KEYBITS: 1024
-  GSI_DAEMON_DIRECTORY: /etc/grid-security
-  GSI_DAEMON_TRUSTED_CA_DIR: /etc/grid-security/certificates/
-  GSI_DAEMON_CERT: /tmp/x509proxy.pem
-  GSI_DAEMON_KEY: /tmp/x509proxy.pem
-  UPDATE_COLLECTOR_WITH_TCP: True
-  MAXJOBRETIREMENTTIME: 48*3600
-  STARTD_CRON_JOBLIST: $(STARTD_CRON_JOBLIST) atlval
-  STARTD_CRON_ATLVAL_MODE: Periodic
-  STARTD_CRON_ATLVAL_EXECUTABLE: /usr/libexec/atlval.sh
-  STARTD_CRON_ATLVAL_PERIOD: 60s
-  STARTD_CRON_ATLVAL_JOB_LOAD: 0.1
-  UPDATE_INTERVAL: 60
-  MASTER_UPDATE_INTERVAL: 60
-  NUM_SLOTS: 1
-  SLOT1_USER: cuser1
-  PRIVATE_NETWORK_INTERFACE: IPADDRESS
-  PRIVATE_NETWORK_NAME: ##user_data_manager_hostname##
-  CCB_ADDRESS: $(COLLECTOR_HOST)
-  CCB_HEARTBEAT_INTERVAL: 120
-  HIGHPORT: 25000
-  STARTD_NOCLAIM_SHUTDOWN: 600
 runcmd:
   - mkdir -p /scratch/condor/
   - chown condor:condor /scratch/condor/
-  - echo 'cuser1 ALL=(ALL) NOPASSWD:/sbin/shutdown' >> /etc/sudoers
+  - echo 'cndrusr1 ALL=(ALL) NOPASSWD:/sbin/shutdown' >> /etc/sudoers
 write_files:
-  - owner: root:root
-    path: /root/pool_password_option
-    permissions: '0644'
-    encoding: b64
-    content: ##user_data_option_pool_password##
   - owner: root:root
     path: /etc/condor/canonical_map
     permissions: '0644'
     content: |
-        PASSWORD (.*) cuser1
-        GSI (.*) cuser1
-        SSL (.*) cuser1
+        PASSWORD (.*) cndrusr1
+        GSI (.*) cndrusr1
+        SSL (.*) cndrusr1
 #
 # Note the write_files module must be the last one in VMCondor_cloud-config as
 # per experiment files will be appended to it and VMCondor_cloud-config before

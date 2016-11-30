@@ -1,5 +1,5 @@
   - owner: root:root
-    path: /usr/local/bin/lcg-atlas
+    path: /usr/local/bin/user_job_wrapper
     permissions: '0755'
     content: |
         #!/bin/bash

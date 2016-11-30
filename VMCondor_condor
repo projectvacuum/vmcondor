@@ -1,0 +1,36 @@
+condor:
+  HOSTNAME: ##user_data_machine_hostname##
+  CONDOR_HOST: collector.example.com
+  COLLECTOR_HOST: $(CONDOR_HOST)
+  COLLECTOR_PORT: 9618
+  CLAIM_WORKLIFE: 0
+  DEDICATED_EXECUTE_ACCOUNT_REGEXP: cndrusr[0-9]+
+  JAVA: /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java
+  ENABLE_SSH_TO_JOB: True
+  CERTIFICATE_MAPFILE: /etc/condor/canonical_map
+  EXECUTE: /scratch/condor
+  MASTER_DEBUG: D_FULLDEBUG
+  STARTER_DEBUG: D_FULLDEBUG
+  STARTD_DEBUG: D_FULLDEBUG
+  SEC_DEFAULT_AUTHENTICATION: REQUIRED
+  SEC_DEFAULT_AUTHENTICATION_METHODS: PASSWORD, GSI
+  SEC_PASSWORD_FILE: /root/pool_password
+  GSI_DELEGATION_KEYBITS: 1024
+  GSI_DAEMON_DIRECTORY: /etc/grid-security
+  GSI_DAEMON_TRUSTED_CA_DIR: /etc/grid-security/certificates/
+  GSI_DAEMON_CERT: /tmp/x509proxy.pem
+  GSI_DAEMON_KEY: /tmp/x509proxy.pem
+  UPDATE_COLLECTOR_WITH_TCP: True
+  MAXJOBRETIREMENTTIME: 48*3600
+  UPDATE_INTERVAL: 60
+  MASTER_UPDATE_INTERVAL: 60
+  NUM_SLOTS: 1
+  SLOT1_USER: cndrusr1
+  CCB_ADDRESS: $(COLLECTOR_HOST)
+  CCB_HEARTBEAT_INTERVAL: 120
+  HIGHPORT: 25000
+  STARTD_NOCLAIM_SHUTDOWN: 600
+#
+# Any per-VO settings are appended here from 
+# files with names matching *.condor
+#
