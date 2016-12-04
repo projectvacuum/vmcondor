@@ -31,6 +31,6 @@ condor:
   HIGHPORT: 25000
   STARTD_NOCLAIM_SHUTDOWN: 600
 #
-# Any per-VO settings are appended here from 
-# files with names matching *.condor
+# Any per-VO settings are appended here 
+# from the XXXX.condor file
 #

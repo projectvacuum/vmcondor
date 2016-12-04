@@ -1,16 +1,16 @@
-user_data: make_multipart_user_data          \
+
+all: ATLAS.user_data vm20.user_data
+
+VMCONDOR_FILES=make_multipart_user_data      \
                   VMCondor_comments          \
                   VMCondor_condor            \
                   VMCondor_cloud-config      \
                   VMCondor_ucernvm           \
-                  VMCondor_shellscript	     \
-                  *.write_files              \
-                  *.condor
-	cat VMCondor_cloud-config *.write_files VMCondor_condor > tmp_cloud-config ; \
-          sed 's/^/  /' *.condor >> tmp_cloud-config ; \
-          ./make_multipart_user_data            \
-             VMCondor_comments:comment          \
-             tmp_cloud-config:cloud-config      \
-             VMCondor_ucernvm:ucernvm           \
-             VMCondor_shellscript:x-shellscript \
-             > user_data
+                  VMCondor_shellscript
+
+ATLAS.user_data: ATLAS.write_files ATLAS.condor $(VMCONDOR_FILES)
+	./make_VMCondor_user_data ATLAS
+
+vm20.user_data: vm20.write_files vm20.condor $(VMCONDOR_FILES)
+	./make_VMCondor_user_data vm20
+
