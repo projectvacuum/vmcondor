@@ -13,52 +13,55 @@ EOF
 chown root.root /tmp/x509proxy.pem
 chmod 0400 /tmp/x509proxy.pem
 
-# Start condor with proper config and pool_password file
-#mv -f /etc/sysconfig/condor-saved /etc/sysconfig/condor
-#service condor restart
-
 # Send a heartbeat every 5 minutes
 (
 while true
 do
   echo `cut -f1-3 -d' ' /proc/loadavg` `cat /proc/uptime` >/var/spool/joboutputs/heartbeat
   date --utc +"%Y-%m-%d %H:%M:%S %Z Uploading heartbeat"
-  /usr/bin/curl --max-time 30 --location --upload-file /var/spool/joboutputs/heartbeat '##user_data_joboutputs_url##/heartbeat'
+  /usr/bin/curl --max-time 30 --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file /var/spool/joboutputs/heartbeat '##user_data_joboutputs_url##/heartbeat'
   date --utc +"%Y-%m-%d %H:%M:%S %Z curl returns $?"
   sleep 300
 done
 ) >/var/log/heartbeat.log 2>&1 &
 
-# Record Condor configuration
+# In case the VO needs to update Condor configuration with a script
+if [ -x /usr/local/bin/condor_config_script ] ; then
+  /usr/local/bin/condor_config_script
+fi
+
+# Record final Condor configuration
 condor_config_val -dump >/var/spool/joboutputs/condor_config_val-dump.log
 
-# Give Condor 10 minutes to have find a job, then shutdown whenever it finishes (or now)
+# In the background, give Condor 30 minutes to find a job then tell it to stop after the job (or now!)
 (sleep 1800 ; condor_off -peaceful) &
 
+# Wait till Condor itself finishes, then shutdown
+# This may be earlier than 30 minutes, due to STARTD_NOCLAIM_SHUTDOWN (600s?)
 while true
 do
-  # If condor is running, then go round again after a minute
+  # If Condor is still running, then go round again after a minute
   if ps -C condor_startd ; then sleep 60 ; continue ; fi
   
+  # Always try to make simple HTCondor shutdown message
   grep 'Inside OsProc::JobExit' /var/log/condor/StarterLog >/dev/null 2>/dev/null
   if [ $? != 0 ] ; then
     echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
-  else
-    ###  These bits are still ATLAS specific!
-    grep 'Dispatcher response.*PandaID' /var/spool/joboutputs/*.condor.stdout >/dev/null 2>/dev/null 
-    if [ $? != 0 ] ; then
-      echo '300 No PanDA job to run' > /var/spool/joboutputs/shutdown_message
-    else
-      echo '200 Success' > /var/spool/joboutputs/shutdown_message 
-    fi
-    ###
   fi
-  
+
+  # If VO provides something else, run that too
+  if [ -x /usr/local/bin/make_shutdown_message ] ; then
+    /usr/local/bin/make_shutdown_message
+  fi
+
   # Time to upload and shutdown
   cd /var/spool/joboutputs
   cp -f /var/log/condor/* /var/log/cloud-init*.log .
-  export certHostname=`openssl x509 -in /tmp/x509proxy.pem -subject -noout | sed 's:.*/CN=\([a-z0-9.-]*\).*:\1:'`
-  for i in * ; do curl --location --upload-file "$i" '##user_data_joboutputs_url##/' ; curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --key /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/$certHostname/atlas/##user_data_space##/$HOSTNAME/##user_data_uuid##/" ; done
+  for i in * 
+  do 
+    curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" '##user_data_joboutputs_url##/'
+    curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/hosts/##user_data_space##/##user_data_machinetype##/##user_data_machine_hostname##/##user_data_uuid##/"
+  done
 
   # Try normal shutdown
   shutdown -h now

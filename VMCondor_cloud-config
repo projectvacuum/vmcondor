@@ -2,7 +2,6 @@ output: {all: '| tee -a /var/log/cloud-init-output.log'}
 bootcmd:
   - hostname ##user_data_machine_hostname##
   - echo `hostname --all-ip-addresses` `hostname` >>/etc/hosts
-  - dig TXT +short o-o.myaddr.l.google.com @ns.google.com  | tr -d '"' > /var/cache/public_address || echo 0.0.0.0 > /var/cache/public_address || echo 0.0.0.0
   - mkdir /scratch && chmod ugo+rwxt /scratch && mkfs -q -t ext4 /dev/vda2 && mount /dev/vda2 /scratch
   - fallocate -l 8G /mnt/.rw/swapfile
   - chmod 0600 /mnt/.rw/swapfile
@@ -18,7 +17,6 @@ cvmfs:
 runcmd:
   - mkdir -p /scratch/condor/
   - chown condor:condor /scratch/condor/
-  - echo 'cndrusr1 ALL=(ALL) NOPASSWD:/sbin/shutdown' >> /etc/sudoers
 write_files:
 #
 # Note the write_files module must be the last one in VMCondor_cloud-config as

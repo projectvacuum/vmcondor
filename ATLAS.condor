@@ -1,3 +1,4 @@
+START: FALSE
 CONDOR_HOST: aipanda138.cern.ch
 COLLECTOR_HOST: aipanda138.cern.ch:20618
 CONDOR_ADMIN: root@aipanda138.cern.ch:20618
@@ -6,3 +7,5 @@ HOSTALLOW_DAEMON: IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.
 USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper
 GSITE: '"##user_data_option_queue##"'
 STARTD_ATTRS: GSITE
+SEC_DEFAULT_AUTHENTICATION_METHODS: PASSWORD, GSI
+SEC_PASSWORD_FILE: /root/pool_password

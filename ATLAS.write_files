@@ -19,3 +19,27 @@
         curl 'http://bigpanda.cern.ch/jobs/?computingsite=##user_data_option_queue##' >/var/spool/joboutputs/`pwd|sed 's:^.*/::'`.jobs.html
 
         $* | tee /var/spool/joboutputs/`pwd|sed 's:^.*/::'`.condor.stdout
+  - owner: root:root
+    path: /usr/local/bin/make_shutdown_message
+    permissions: '0755'
+    content: |
+        #!/bin/bash
+        grep 'Inside OsProc::JobExit' /var/log/condor/StarterLog >/dev/null 2>/dev/null
+        if [ $? != 0 ] ; then
+          echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
+        else
+          grep 'Dispatcher response.*PandaID' /var/spool/joboutputs/*.condor.stdout >/dev/null 2>/dev/null 
+          if [ $? != 0 ] ; then
+            echo '300 No PanDA job to run' > /var/spool/joboutputs/shutdown_message
+          else
+            echo '200 Success' > /var/spool/joboutputs/shutdown_message 
+          fi
+        fi
+  - owner: root:root
+    path: /usr/local/bin/condor_config_script
+    permissions: '0755'
+    content: |
+        #!/bin/bash
+        curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem https://depo.gridpp.ac.uk/pool-password.cgi | base64 -d >/root/pool_password
+        echo 'START = TRUE' >>/etc/condor/condor_config.local
+        condor_reconfig
