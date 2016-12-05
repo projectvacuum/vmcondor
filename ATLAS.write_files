@@ -19,25 +19,3 @@
         curl 'http://bigpanda.cern.ch/jobs/?computingsite=##user_data_option_queue##' >/var/spool/joboutputs/`pwd|sed 's:^.*/::'`.jobs.html
 
         $* | tee /var/spool/joboutputs/`pwd|sed 's:^.*/::'`.condor.stdout
-
-  - owner: root:root
-    path: /usr/libexec/atlval.sh
-    permissions: '0755'
-    content: |
-        #!/bin/bash
-        # Anything printed out is interpreted as a classad attribute
-        # and can be used in the START expression
-         
-        result=True
-         
-        ls /cvmfs/atlas.cern.ch/repo/sw &> /dev/null
-        if [ $? -ne 0 ];then
-        result=False
-        fi
-         
-        grep CVMFS_CACHE_BASE /etc/cvmfs/default.local &> /dev/null
-        if [ $? -ne 0 ];then
-           result=False
-        fi
-         
-        echo ATLAS_VALID = $result

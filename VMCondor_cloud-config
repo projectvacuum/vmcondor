@@ -2,8 +2,6 @@ output: {all: '| tee -a /var/log/cloud-init-output.log'}
 bootcmd:
   - hostname ##user_data_machine_hostname##
   - echo `hostname --all-ip-addresses` `hostname` >>/etc/hosts
-  - mv -f /etc/sysconfig/condor /etc/sysconfig/condor-saved
-  - echo 'exit 0'  > /etc/sysconfig/condor
   - dig TXT +short o-o.myaddr.l.google.com @ns.google.com  | tr -d '"' > /var/cache/public_address || echo 0.0.0.0 > /var/cache/public_address || echo 0.0.0.0
   - mkdir /scratch && chmod ugo+rwxt /scratch && mkfs -q -t ext4 /dev/vda2 && mount /dev/vda2 /scratch
   - fallocate -l 8G /mnt/.rw/swapfile
@@ -22,13 +20,6 @@ runcmd:
   - chown condor:condor /scratch/condor/
   - echo 'cndrusr1 ALL=(ALL) NOPASSWD:/sbin/shutdown' >> /etc/sudoers
 write_files:
-  - owner: root:root
-    path: /etc/condor/canonical_map
-    permissions: '0644'
-    content: |
-        PASSWORD (.*) cndrusr1
-        GSI (.*) cndrusr1
-        SSL (.*) cndrusr1
 #
 # Note the write_files module must be the last one in VMCondor_cloud-config as
 # per experiment files will be appended to it and VMCondor_cloud-config before

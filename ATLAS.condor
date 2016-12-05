@@ -6,10 +6,3 @@ HOSTALLOW_DAEMON: IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.
 USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper
 GSITE: '"##user_data_option_queue##"'
 STARTD_ATTRS: GSITE
-PRIVATE_NETWORK_INTERFACE: IPADDRESS
-PRIVATE_NETWORK_NAME: ##user_data_manager_hostname##
-STARTD_CRON_JOBLIST: $(STARTD_CRON_JOBLIST) atlval
-STARTD_CRON_ATLVAL_MODE: Periodic
-STARTD_CRON_ATLVAL_EXECUTABLE: /usr/libexec/atlval.sh
-STARTD_CRON_ATLVAL_PERIOD: 60s
-STARTD_CRON_ATLVAL_JOB_LOAD: 0.1
