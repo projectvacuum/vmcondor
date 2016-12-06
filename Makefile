@@ -14,6 +14,6 @@ ATLAS.user_data: ATLAS.write_files ATLAS.condor $(VMCONDOR_FILES)
 ALICE.user_data: ALICE.write_files ALICE.condor $(VMCONDOR_FILES)
 	./make_VMCondor_user_data ALICE
 
-vm20.user_data: vm20.condor $(VMCONDOR_FILES)
+vm20.user_data: vm20.write_files vm20.condor $(VMCONDOR_FILES)
 	./make_VMCondor_user_data vm20
 
