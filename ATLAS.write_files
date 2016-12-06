@@ -44,5 +44,3 @@
         if [ -s /root/pool_password ] ; then
           echo -e 'SEC_DEFAULT_AUTHENTICATION_METHODS: PASSWORD, GSI\nSEC_PASSWORD_FILE: /root/pool_password' >>/etc/condor/condor_config.local
         fi
-        echo 'START = TRUE' >>/etc/condor/condor_config.local
-        condor_reconfig

@@ -6,9 +6,16 @@ if [ "$1" = "" ] ; then
 fi
 
 cat VMCondor_cloud-config	 > tmp_cloud-config
-cat $1.write_files		>> tmp_cloud-config
+
+if [ -r "$1.write_files" ] ; then
+ cat $1.write_files		>> tmp_cloud-config
+fi
+
 cat VMCondor_condor		>> tmp_cloud-config
-sed 's/^/  /' $1.condor		>> tmp_cloud-config
+
+if [ -r "$1.condor" ] ; then
+ sed 's/^/  /' $1.condor	>> tmp_cloud-config
+fi
 
 ./make_multipart_user_data            \
    VMCondor_comments:comment          \

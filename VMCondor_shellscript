@@ -25,49 +25,62 @@ do
 done
 ) >/var/log/heartbeat.log 2>&1 &
 
+# We didn't start at boot time, to allow /tmp/x509proxy.pem creation etc
+echo 'START = TRUE' >>/etc/condor/condor_config.local
+
+# Use a job wrapper if it exists
+if [ -x /usr/local/bin/user_job_wrapper ] ; then
+  echo 'USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper' >>/etc/condor/condor_config.local
+fi
+
 # In case the VO needs to update Condor configuration with a script
 if [ -x /usr/local/bin/condor_config_script ] ; then
   /usr/local/bin/condor_config_script
 fi
 
+# Apply the updated configuration
+condor_reconfig
+
 # Record final Condor configuration
+date --utc +"%Y-%m-%d %H:%M:%S %Z Recording final HTCondor configuration"
 condor_config_val -dump >/var/spool/joboutputs/condor_config_val-dump.log
 
+# Wait for condor_startd to start
+while ! ps -C condor_startd >/dev/null ; do date --utc +"%Y-%m-%d %H:%M:%S %Z condor_startd not yet started" ; sleep 10 ; done
+
 # In the background, give Condor 30 minutes to find a job then tell it to stop after the job (or now!)
+# Condor may stop before condor_off is run, due to STARTD_NOCLAIM_SHUTDOWN (600s?)
 (sleep 1800 ; condor_off -peaceful) &
 
-# Wait till Condor itself finishes, then shutdown
-# This may be earlier than 30 minutes, due to STARTD_NOCLAIM_SHUTDOWN (600s?)
-while true
-do
-  # If Condor is still running, then go round again after a minute
-  if ps -C condor_startd ; then sleep 60 ; continue ; fi
+# Wait for condor_startd to stop
+date --utc +"%Y-%m-%d %H:%M:%S %Z Waiting for condor_startd to finish"
+while ps -C condor_startd >/dev/null ; do sleep 60 ; done
+date --utc +"%Y-%m-%d %H:%M:%S %Z condor_startd finished"
   
-  # Always try to make simple HTCondor shutdown message
-  grep 'Inside OsProc::JobExit' /var/log/condor/StarterLog >/dev/null 2>/dev/null
-  if [ $? != 0 ] ; then
-    echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
-  fi
+# Always try to make simple HTCondor shutdown message
+grep 'Inside OsProc::JobExit' /var/log/condor/StarterLog >/dev/null 2>/dev/null
+if [ $? != 0 ] ; then
+  echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
+fi
 
-  # If VO provides something else, run that too
-  if [ -x /usr/local/bin/make_shutdown_message ] ; then
-    /usr/local/bin/make_shutdown_message
-  fi
+# If VO provides something else, run that too
+if [ -x /usr/local/bin/make_shutdown_message ] ; then
+  /usr/local/bin/make_shutdown_message
+fi
 
-  # Time to upload and shutdown
-  cd /var/spool/joboutputs
-  cp -f /var/log/condor/* /var/log/cloud-init*.log .
-  for i in * 
-  do 
-    curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" '##user_data_joboutputs_url##/'
-    curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/hosts/##user_data_space##/##user_data_machinetype##/##user_data_machine_hostname##/##user_data_uuid##/"
-  done
-
-  # Try normal shutdown
-  shutdown -h now
-  sleep 60
-  # Otherwise instant shutdown
-  echo o > /proc/sysrq-trigger
+# Time to upload and shutdown
+cd /var/spool/joboutputs
+cp -f /var/log/condor/* /var/log/cloud-init*.log .
+for i in * 
+do 
+  curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" '##user_data_joboutputs_url##/'
+  curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/hosts/##user_data_space##/##user_data_machinetype##/##user_data_machine_hostname##/##user_data_uuid##/"
 done
+
+# Try normal shutdown
+shutdown -h now
+sleep 60
+# Otherwise instant shutdown
+echo o > /proc/sysrq-trigger
 
 ) >/var/spool/joboutputs/shellscript.log 2>&1 &
