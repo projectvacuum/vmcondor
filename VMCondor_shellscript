@@ -28,10 +28,21 @@ done
 # We didn't start at boot time, to allow /tmp/x509proxy.pem creation etc
 echo 'START = TRUE' >>/etc/condor/condor_config.local
 
-# Use a job wrapper if it exists
-if [ -x /usr/local/bin/user_job_wrapper ] ; then
-  echo 'USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper' >>/etc/condor/condor_config.local
+# Default job wrapper if not created by VO write_files section
+if [ ! -e /usr/local/bin/user_job_wrapper ] ; then
+  cat <<EOF >/usr/local/bin/user_job_wrapper
+#!/bin/sh
+export HOME=\`pwd\`
+. /etc/profile
+. /etc/bashrc
+. /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/a1_grid_env.sh
+. /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/setup-wn-example.sh
+exec "\$*"
+EOF
 fi
+
+# Make sure it is executable anyway
+chmod 0755 /usr/local/bin/user_job_wrapper
 
 # In case the VO needs to update Condor configuration with a script
 if [ -x /usr/local/bin/condor_config_script ] ; then

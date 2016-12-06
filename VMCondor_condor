@@ -46,6 +46,7 @@ condor:
   UPDATE_COLLECTOR_WITH_TCP: TRUE
   UPDATE_INTERVAL: 60
   USE_SHARED_PORT: TRUE 
+  USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper
 #
 # Any per-VO settings are appended here 
 # from the XXXX.condor file

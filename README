@@ -17,6 +17,8 @@ be used by VMCondor:
 
 /usr/local/bin/user_job_wrapper is an HTCondor USER_JOB_WRAPPER which
 is run before each HTCondor job. The script must end with  exec "$*"
+If user_job_wrapper is not provided, then VMCondor will give HTCondor
+a default that approximates a WLCG worker node using scripts in cvmfs.
 
 /usr/local/bin/condor_config_script is run before VMCondor loads the
 final HTCondor configuration and HTCondor starts to run jobs.
