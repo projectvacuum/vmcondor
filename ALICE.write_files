@@ -6,4 +6,6 @@
         export HOME=$(pwd)
         . /etc/profile
         . /etc/bashrc
+        . /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/a1_grid_env.sh
+        . /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/setup-wn-example.sh
         exec "$*"
