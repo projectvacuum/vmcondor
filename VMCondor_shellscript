@@ -57,10 +57,11 @@ date --utc +"%Y-%m-%d %H:%M:%S %Z Waiting for condor_startd to finish"
 while ps -C condor_startd >/dev/null ; do sleep 60 ; done
 date --utc +"%Y-%m-%d %H:%M:%S %Z condor_startd finished"
   
-# Always try to make simple HTCondor shutdown message
-grep 'Inside OsProc::JobExit' /var/log/condor/StarterLog >/dev/null 2>/dev/null
-if [ $? != 0 ] ; then
+# Always try to make simple HTCondor shutdown messages
+if [ ! -s /var/log/condor/startd_history ] ; then
   echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
+else
+  echo '200 Success' > /var/spool/joboutputs/shutdown_message
 fi
 
 # If VO provides something else, run that too

@@ -12,7 +12,7 @@ cvmfs:
     local:
         CVMFS_CACHE_BASE: /mnt/.rw/cvmfs-cache
         CVMFS_QUOTA_LIMIT: 7000
-        CVMFS_REPOSITORIES: grid,atlas
+        CVMFS_REPOSITORIES: grid,alice,atlas,cms,lhcb
         CVMFS_HTTP_PROXY: ##user_data_option_cvmfs_proxy##
 runcmd:
   - mkdir -p /scratch/condor/
