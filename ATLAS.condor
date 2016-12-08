@@ -3,7 +3,6 @@ COLLECTOR_HOST: aipanda138.cern.ch:20618
 CONDOR_ADMIN: root@aipanda138.cern.ch:20618
 ALLOW_DAEMON: 127.0.0.1, IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
 HOSTALLOW_DAEMON: IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
-USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper
 GSITE: '"##user_data_option_queue##"'
 STARTD_ATTRS: GSITE
 SEC_DEFAULT_AUTHENTICATION_METHODS: GSI,FS,PASSWORD

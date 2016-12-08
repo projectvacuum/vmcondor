@@ -6,7 +6,6 @@ condor:
   CCB_HEARTBEAT_INTERVAL: 120
   CLAIM_WORKLIFE: 0
   COLLECTOR_HOST: $(CONDOR_HOST)
-  COLLECTOR_NAME: VMCondor space ##user_data_space##
   COLLECTOR_PORT: 9618
   CONDOR_ADMIN: root@$(CONDOR_HOST)
   DAEMON_LIST: MASTER, STARTD 
@@ -39,6 +38,7 @@ condor:
   SEC_ENABLE_MATCH_PASSWORD_AUTHENTICATION: FALSE
   SLOT1_USER: cndrusr1
   START: FALSE
+  STARTD_ATTRS: VacuumSpace
   STARTD_DEBUG: D_FULLDEBUG
   STARTD_NOCLAIM_SHUTDOWN: 600
   STARTER_DEBUG: D_FULLDEBUG
@@ -47,6 +47,7 @@ condor:
   UPDATE_INTERVAL: 60
   USE_SHARED_PORT: TRUE 
   USER_JOB_WRAPPER: /usr/local/bin/user_job_wrapper
+  VacuumSpace: "##user_data_space##"
 #
 # Any per-VO settings are appended here 
 # from the XXXX.condor file
