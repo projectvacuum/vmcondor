@@ -1,1 +1,1 @@
-CONDOR_HOST: lws-condor.cern.ch
+CONDOR_HOST: $(CONDOR_HOST:lws-condor.cern.ch)
