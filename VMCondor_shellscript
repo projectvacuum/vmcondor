@@ -25,6 +25,10 @@ do
 done
 ) >/var/log/heartbeat.log 2>&1 &
 
+# Hard links to _condor_stdout and _condor_stderr of HTCondor jobs go here
+mkdir -p /scratch/joblogs
+chmod ugo+wxt,u+r,go-r /scratch/joblogs
+
 # We didn't start at boot time, to allow /tmp/x509proxy.pem creation etc
 echo 'START = TRUE' >>/etc/condor/condor_config.local
 
@@ -37,6 +41,9 @@ export HOME=\`pwd\`
 . /etc/bashrc
 . /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/a1_grid_env.sh
 . /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/setup-wn-example.sh
+random=`/usr/bin/openssl rand -hex 16`
+ln _condor_stdout /scratch/joblogs/_condor_stdout.$random
+ln _condor_stderr /scratch/joblogs/_condor_stderr.$random
 exec "\$*"
 EOF
 fi
@@ -82,7 +89,7 @@ fi
 
 # Time to upload and shutdown
 cd /var/spool/joboutputs
-cp -f /var/log/condor/* /var/log/cloud-init*.log .
+cp -f /var/log/condor/* /var/log/cloud-init*.log /scratch/joblogs/* .
 for i in * 
 do 
   curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" '##user_data_joboutputs_url##/'

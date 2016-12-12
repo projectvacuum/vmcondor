@@ -18,9 +18,20 @@ runcmd:
   - mkdir -p /scratch/condor/
   - chown condor:condor /scratch/condor/
 write_files:
+  - owner: root:root
+    path: /etc/profile.d/mjf.sh
+    permissions: '0644'
+    content: |
+        export MACHINEFEATURES=##user_data_machinefeatures_url##
+        export JOBFEATURES=##user_data_jobfeatures_url##
+        export JOBOUTPUTS=##user_data_joboutputs_url##
+  - owner: root:root
+    path: /etc/profile.d/mjf.csh
+    permissions: '0644'
+    content: |
+        setenv MACHINEFEATURES ##user_data_machinefeatures_url##
+        setenv JOBFEATURES ##user_data_jobfeatures_url##
+        setenv JOBOUTPUTS ##user_data_joboutputs_url##
 #
-# Note the write_files module must be the last one in VMCondor_cloud-config as
-# per experiment files will be appended to it and VMCondor_cloud-config before
-# including it in the multipart MIME file
+# Per-experiment write_files sections are appended here ...
 #
-# More write_files per-file sections go here ...

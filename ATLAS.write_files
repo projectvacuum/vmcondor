@@ -3,9 +3,11 @@
     permissions: '0755'
     content: |
         #!/bin/bash
-
         export HOME=$(pwd)
         export USER=$(whoami)
+        random=`/usr/bin/openssl rand -hex 16`
+        ln _condor_stdout /scratch/joblogs/_condor_stdout.$random
+        ln _condor_stderr /scratch/joblogs/_condor_stderr.$random
         source /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/a1_grid_env.sh
         source /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/setup-wn-example.sh
         export VO_ATLAS_SW_DIR=/cvmfs/atlas.cern.ch/repo/sw
@@ -17,8 +19,7 @@
         VERSION=$(${ATLAS_LOCAL_ROOT_BASE}/utilities/fetchVersions.sh --name=xrootd --followSL --format=bareList | grep ${XROOTD_VERSION}-x86_64-slc6)
         source ${ROOT}/bin/setxrd.sh ${ATLAS_LOCAL_ROOT}/xrootd/${VERSION}/v${XROOTD_VERSION}
         curl 'http://bigpanda.cern.ch/jobs/?computingsite=##user_data_option_queue##' >/var/spool/joboutputs/`pwd|sed 's:^.*/::'`.jobs.html
-
-        $* | tee /var/spool/joboutputs/`pwd|sed 's:^.*/::'`.condor.stdout
+        exec "$*"
   - owner: root:root
     path: /usr/local/bin/make_shutdown_message
     permissions: '0755'
@@ -28,7 +29,7 @@
         if [ $? != 0 ] ; then
           echo '300 No HTCondor job to run' > /var/spool/joboutputs/shutdown_message
         else
-          grep 'Dispatcher response.*PandaID' /var/spool/joboutputs/*.condor.stdout >/dev/null 2>/dev/null 
+          grep 'Dispatcher response.*PandaID' /scratch/joblogs/_condor_stdout.* >/dev/null 2>/dev/null 
           if [ $? != 0 ] ; then
             echo '300 No PanDA job to run' > /var/spool/joboutputs/shutdown_message
           else
