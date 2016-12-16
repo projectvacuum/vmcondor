@@ -1,7 +1,7 @@
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
 bootcmd:
   - hostname ##user_data_machine_hostname##
-  - echo `hostname --all-ip-addresses` `hostname` >>/etc/hosts
+  - echo `hostname --all-ip-addresses` `hostname` `hostname -s` >>/etc/hosts
   - mkdir /scratch && chmod ugo+rwxt /scratch && mkfs -q -t ext4 /dev/vda2 && mount /dev/vda2 /scratch
   - fallocate -l 8G /mnt/.rw/swapfile
   - chmod 0600 /mnt/.rw/swapfile
@@ -45,7 +45,7 @@ write_files:
         random=`/usr/bin/openssl rand -hex 16`
         ln _condor_stdout /scratch/joblogs/_condor_stdout.$random
         ln _condor_stderr /scratch/joblogs/_condor_stderr.$random
-        exec "$*"
+        exec $*
 #
 # Per-experiment write_files sections are appended here ...
 #

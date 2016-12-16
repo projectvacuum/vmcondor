@@ -1,5 +1,5 @@
 ALLOW_DAEMON: 127.0.0.1, IPADDRESS, aipanda136.cern.ch, aipanda130.cern.ch, aipanda132.cern.ch, aipanda135.cern.ch, aipanda138.cern.ch
-CONDOR_HOST: $(CONDOR_HOST:aipanda138.cern.ch)
+CONDOR_HOST: aipanda138.cern.ch
 COLLECTOR_HOST: aipanda138.cern.ch:20618
 CONDOR_ADMIN: root@aipanda138.cern.ch:20618
 DISABLE_AUTHENTICATION_IP_CHECK: TRUE

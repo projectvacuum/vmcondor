@@ -19,7 +19,7 @@
         VERSION=$(${ATLAS_LOCAL_ROOT_BASE}/utilities/fetchVersions.sh --name=xrootd --followSL --format=bareList | grep ${XROOTD_VERSION}-x86_64-slc6)
         source ${ROOT}/bin/setxrd.sh ${ATLAS_LOCAL_ROOT}/xrootd/${VERSION}/v${XROOTD_VERSION}
         curl 'http://bigpanda.cern.ch/jobs/?computingsite=##user_data_option_queue##' >/var/spool/joboutputs/`pwd|sed 's:^.*/::'`.jobs.html
-        exec "$*"
+        exec $*
   - owner: root:root
     path: /usr/local/bin/make_shutdown_message
     permissions: '0755'
