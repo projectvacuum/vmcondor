@@ -18,7 +18,6 @@
         XROOTD_VERSION=$(${ROOT}/bin/root-config --config | sed 's#.*xrootd/\([^/]*\).*#\1#g')
         VERSION=$(${ATLAS_LOCAL_ROOT_BASE}/utilities/fetchVersions.sh --name=xrootd --followSL --format=bareList | grep ${XROOTD_VERSION}-x86_64-slc6)
         source ${ROOT}/bin/setxrd.sh ${ATLAS_LOCAL_ROOT}/xrootd/${VERSION}/v${XROOTD_VERSION}
-        curl 'http://bigpanda.cern.ch/jobs/?computingsite=##user_data_option_queue##' >/var/spool/joboutputs/`pwd|sed 's:^.*/::'`.jobs.html
         exec $*
   - owner: root:root
     path: /usr/local/bin/make_shutdown_message
@@ -41,7 +40,17 @@
     permissions: '0755'
     content: |
         #!/bin/bash
-        curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem https://depo.gridpp.ac.uk/pool-password.cgi | base64 -d >/root/pool_password
-        if [ -s /root/pool_password ] ; then
-          echo -e 'SEC_DEFAULT_AUTHENTICATION_METHODS: PASSWORD, GSI\nSEC_PASSWORD_FILE: /root/pool_password' >>/etc/condor/condor_config.local
-        fi
+        case "##user_data_space##" in
+        *.hep.manchester.ac.uk)
+          echo 'GSITE: "UKI-NORTHGRID-MAN-HEP_VAC"' >>/etc/condor/condor_config.local
+          ;;
+        *.ph.liv.ac.uk)
+          echo 'GSITE: "UKI-NORTHGRID-LIV-HEP_VAC"' >>/etc/condor/condor_config.local
+          ;;
+        *.physics.ox.ac.uk)
+          echo 'GSITE: "UKI-SOUTHGRID-OX-HEP_VAC"' >>/etc/condor/condor_config.local
+          ;;
+        *.hep.ucl.ac.uk)
+          echo 'GSITE: "UKI-LT2-UCL-HEP_VAC"' >>/etc/condor/condor_config.local
+          ;;
+        esac
