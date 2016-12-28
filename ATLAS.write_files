@@ -42,15 +42,15 @@
         #!/bin/bash
         case "##user_data_space##" in
         *.hep.manchester.ac.uk)
-          echo 'GSITE: "UKI-NORTHGRID-MAN-HEP_VAC"' >>/etc/condor/condor_config.local
+          echo 'GSITE = "UKI-NORTHGRID-MAN-HEP_VAC"' >>/etc/condor/condor_config.local
           ;;
         *.ph.liv.ac.uk)
-          echo 'GSITE: "UKI-NORTHGRID-LIV-HEP_VAC"' >>/etc/condor/condor_config.local
+          echo 'GSITE = "UKI-NORTHGRID-LIV-HEP_VAC"' >>/etc/condor/condor_config.local
           ;;
         *.physics.ox.ac.uk)
-          echo 'GSITE: "UKI-SOUTHGRID-OX-HEP_VAC"' >>/etc/condor/condor_config.local
+          echo 'GSITE = "UKI-SOUTHGRID-OX-HEP_VAC"' >>/etc/condor/condor_config.local
           ;;
         *.hep.ucl.ac.uk)
-          echo 'GSITE: "UKI-LT2-UCL-HEP_VAC"' >>/etc/condor/condor_config.local
+          echo 'GSITE = "UKI-LT2-UCL-HEP_VAC"' >>/etc/condor/condor_config.local
           ;;
         esac
