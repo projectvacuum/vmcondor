@@ -41,7 +41,7 @@
     permissions: '0755'
     content: |
         #!/bin/bash
-        if [ `grep '^processor' /proc/cpuinfo |wc --lines` == '8' ] ; then
+        if [ `grep '^processor' /proc/cpuinfo | wc --lines` == '8' ] ; then
          MCORE=_MCORE
         fi
 
