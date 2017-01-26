@@ -12,6 +12,7 @@ cat <<EOF >/tmp/x509proxy.pem
 EOF
 chown root.root /tmp/x509proxy.pem
 chmod 0400 /tmp/x509proxy.pem
+openssl x509 -in /tmp/x509proxy.pem -text > /var/spool/joboutputs/x509proxy.cert.pem
 
 # Send a heartbeat every 5 minutes
 (

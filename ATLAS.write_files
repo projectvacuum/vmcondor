@@ -3,11 +3,12 @@
     permissions: '0755'
     content: |
         #!/bin/bash
-        export HOME=$(pwd)
-        export USER=$(whoami)
         random=`/usr/bin/openssl rand -hex 16`
         ln _condor_stdout /scratch/joblogs/_condor_stdout.$random
         ln _condor_stderr /scratch/joblogs/_condor_stderr.$random
+        export HOME=$(pwd)
+        . /etc/profile
+        . /etc/bashrc
         source /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/a1_grid_env.sh
         source /cvmfs/grid.cern.ch/emi3wn-latest/etc/profile.d/setup-wn-example.sh
         export VO_ATLAS_SW_DIR=/cvmfs/atlas.cern.ch/repo/sw
@@ -40,17 +41,23 @@
     permissions: '0755'
     content: |
         #!/bin/bash
+        if [ `grep '^processor' /proc/cpuinfo |wc --lines` == '8' ] ; then
+         MCORE=_MCORE
+        fi
+
         case "##user_data_space##" in
         *.hep.manchester.ac.uk)
-          echo 'GSITE = "UKI-NORTHGRID-MAN-HEP_VAC"' >>/etc/condor/condor_config.local
+          SITE=UKI-NORTHGRID-MAN-HEP
           ;;
         *.ph.liv.ac.uk)
-          echo 'GSITE = "UKI-NORTHGRID-LIV-HEP_VAC"' >>/etc/condor/condor_config.local
+          SITE=UKI-NORTHGRID-LIV-HEP
           ;;
         *.physics.ox.ac.uk)
-          echo 'GSITE = "UKI-SOUTHGRID-OX-HEP_VAC"' >>/etc/condor/condor_config.local
+          SITE=UKI-SOUTHGRID-OX-HEP
           ;;
         *.hep.ucl.ac.uk)
-          echo 'GSITE = "UKI-LT2-UCL-HEP_VAC"' >>/etc/condor/condor_config.local
+          SITE=UKI-LT2-UCL-HEP
           ;;
         esac
+
+        echo 'GSITE = "'$SITE$MCORE'_VAC"' >>/etc/condor/condor_config.local

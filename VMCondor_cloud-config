@@ -3,10 +3,10 @@ bootcmd:
   - hostname ##user_data_machine_hostname##
   - echo `hostname --all-ip-addresses` `hostname` `hostname -s` >>/etc/hosts
   - mkdir /scratch && chmod ugo+rwxt /scratch && mkfs -q -t ext4 /dev/vda2 && mount /dev/vda2 /scratch
-  - fallocate -l 8G /mnt/.rw/swapfile
-  - chmod 0600 /mnt/.rw/swapfile
-  - mkswap /mnt/.rw/swapfile
-  - swapon /mnt/.rw/swapfile
+  - fallocate -l 8G /scratch/swapfile
+  - chmod 0600 /scratch/swapfile
+  - mkswap /scratch/swapfile
+  - swapon /scratch/swapfile
   - sysctl vm.swappiness=1
 cvmfs:
     local:
