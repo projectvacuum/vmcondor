@@ -42,7 +42,7 @@
     content: |
         #!/bin/bash
         if [ `grep '^processor' /proc/cpuinfo | wc --lines` -gt 1 ] ; then
-         MCORE=_MCORE
+         MCORE=MCORE
         fi
 
         case "##user_data_space##" in
@@ -60,4 +60,4 @@
           ;;
         esac
 
-        echo 'GSITE = "'$SITE$MCORE'_VAC"' >>/etc/condor/condor_config.local
+        echo 'GSITE = "'${SITE}_${MCORE}'VAC"' >>/etc/condor/condor_config.local
