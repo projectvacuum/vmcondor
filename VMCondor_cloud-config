@@ -1,6 +1,7 @@
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
 bootcmd:
   - hostname ##user_data_machine_hostname##
+  - echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
   - echo `hostname --all-ip-addresses` `hostname` `hostname -s` >>/etc/hosts
   - mkdir /scratch && chmod ugo+rwxt /scratch && mkfs -q -t ext4 /dev/vda2 && mount /dev/vda2 /scratch
   - fallocate -l 8G /scratch/swapfile
