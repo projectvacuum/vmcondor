@@ -17,7 +17,7 @@
         ATLAS_LOCAL_CERNROOT_VERSION=$(readlink ${ATLAS_LOCAL_ROOT}/root/current-SL6)
         ROOT=${ATLAS_LOCAL_ROOT}/root/${ATLAS_LOCAL_CERNROOT_VERSION}
         XROOTD_VERSION=$(${ROOT}/bin/root-config --config | sed 's#.*xrootd/\([^/]*\).*#\1#g')
-        VERSION=$(${ATLAS_LOCAL_ROOT_BASE}/utilities/fetchVersions.sh --name=xrootd --followSL --format=bareList | grep ${XROOTD_VERSION}-x86_64-slc6)
+        VERSION=${XROOTD_VERSION}-x86_64-slc6
         source ${ROOT}/bin/setxrd.sh ${ATLAS_LOCAL_ROOT}/xrootd/${VERSION}/v${XROOTD_VERSION}
         exec $*
   - owner: root:root
