@@ -64,6 +64,9 @@
         *.gla.scotgrid.ac.uk)
           SITE=UKI-SCOTGRID-GLASGOW
           ;;
+        *.hep.phy.cam.ac.uk)
+          SITE=UKI-SOUTHGRID-CAM-HEP
+          ;;
         esac
 
         echo 'GSITE = "'${SITE}_${MCORE}'VAC"' >>/etc/condor/condor_config.local
