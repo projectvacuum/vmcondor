@@ -46,7 +46,7 @@
         fi
 
         case "##user_data_space##" in
-        *.hep.manchester.ac.uk)
+        *.manchester.ac.uk)
           SITE=UKI-NORTHGRID-MAN-HEP
           ;;
         *.ph.liv.ac.uk)
