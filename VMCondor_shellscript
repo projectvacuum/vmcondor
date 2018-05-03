@@ -30,7 +30,7 @@ done
 mkdir -p /scratch/joblogs
 chmod ugo+wxt,u+r,go-r /scratch/joblogs
 
-wall_limit_secs=`python -c "import urllib ; print urllib.urlopen('$JOBFEATURES/wall_limit_secs').read().strip()"`
+wall_limit_secs=`python -c "import urllib ; print urllib.urlopen('##user_data_jobfeatures_url##/wall_limit_secs').read().strip()"`
 if [ "$wall_limit_secs" -gt 0 ] ; then
   date --utc +"%Y-%m-%d %H:%M:%S %Z Set MAXJOBRETIREMENTTIME from \$JOBFEATURES/wall_limit_secs = $wall_limit_secs"
   echo "MAXJOBRETIREMENTTIME = $wall_limit_secs" >>/etc/condor/condor_config.local

@@ -1,0 +1,10 @@
+  - owner: root:root
+    path: /usr/local/bin/condor_config_script
+    permissions: '0755'
+    content: |
+        #!/bin/bash
+        if [ "##user_data_option_pool_password_base64##" != ""  ] ; then
+          echo "##user_data_option_pool_password_base64##" | base64 -d > /etc/condor/pool_password
+          chmod 0400 /etc/condor/pool_password
+          echo 'SEC_PASSWORD_FILE = /etc/condor/pool_password' >>/etc/condor/condor_config.local
+        fi
