@@ -5,6 +5,12 @@ mkdir -p /var/spool/joboutputs
 chmod ugo+rwxt /var/spool/joboutputs/
 
 (
+# Cloud Init should do this automatically but something has changed since cernvm3 -> cernvm4
+ls -l /root/.ssh/authorized_keys
+curl http://169.254.169.254/2009-04-04/meta-data/public-keys/0/openssh-key > /root/.ssh/authorized_keys
+echo >> /root/.ssh/authorized_keys
+ls -l /root/.ssh/authorized_keys
+
 cat <<EOF >/tmp/x509proxy.pem
 ##user_data_option_x509_proxy##
 ##user_data_file_hostcert##
@@ -13,6 +19,8 @@ EOF
 chown root.root /tmp/x509proxy.pem
 chmod 0400 /tmp/x509proxy.pem
 openssl x509 -in /tmp/x509proxy.pem -text > /var/spool/joboutputs/x509proxy.cert.pem
+
+job_id=`python -c "import urllib ; print urllib.urlopen('$JOBFEATURES/job_id').read().strip()"`
 
 # Send a heartbeat every 5 minutes
 (
@@ -26,11 +34,14 @@ do
 done
 ) >/var/log/heartbeat.log 2>&1 &
 
+# Remove docker command etc since we don't start docker
+rpm --nodeps -e docker-cernvm
+
 # Hard links to _condor_stdout and _condor_stderr of HTCondor jobs go here
 mkdir -p /scratch/joblogs
 chmod ugo+wxt,u+r,go-r /scratch/joblogs
 
-wall_limit_secs=`python -c "import urllib ; print urllib.urlopen('##user_data_jobfeatures_url##/wall_limit_secs').read().strip()"`
+wall_limit_secs=`python -c "import urllib ; print urllib.urlopen('$JOBFEATURES/wall_limit_secs').read().strip()"`
 if [ "$wall_limit_secs" -gt 0 ] ; then
   date --utc +"%Y-%m-%d %H:%M:%S %Z Set MAXJOBRETIREMENTTIME from \$JOBFEATURES/wall_limit_secs = $wall_limit_secs"
   echo "MAXJOBRETIREMENTTIME = $wall_limit_secs" >>/etc/condor/condor_config.local
@@ -81,7 +92,7 @@ cp -f /var/log/condor/* /var/log/cloud-init*.log /scratch/joblogs/* .
 for i in * 
 do 
   curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" '##user_data_joboutputs_url##/'
-  curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/hosts/##user_data_space##/##user_data_machinetype##/##user_data_machine_hostname##/##user_data_uuid##/"
+  curl --capath /etc/grid-security/certificates/ --cert /tmp/x509proxy.pem --cacert /tmp/x509proxy.pem --location --upload-file "$i" "https://depo.gridpp.ac.uk/hosts/##user_data_space##/##user_data_machinetype##/##user_data_machine_hostname##/$job_id/"
 done
 
 # Try normal shutdown

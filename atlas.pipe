@@ -1,0 +1,55 @@
+{
+  "cache_seconds": 3600,
+  "machinetypes": 
+  [
+   {
+    "suffix": "vm-mcore",
+    "accounting_fqan": "/atlas/Role=NULL/Capability=NULL",
+    "backoff_seconds": 600,
+    "fizzle_seconds": 600,
+    "heartbeat_file": "heartbeat",
+    "heartbeat_seconds": 600,
+    "machine_model": "cernvm3",
+    "min_wallclock_seconds": 260000,
+    "max_wallclock_seconds": 300000,
+    "min_processors": 8,
+    "max_processors": 8,
+    "root_image": "https://repo.gridpp.ac.uk/vacproject/atlas/cernvm3.iso",
+    "target_share": 1.0,
+    "user_data": "https://repo.gridpp.ac.uk/vacproject/atlas/user_data",
+    "user_data_proxy": "true"
+   },
+   {
+    "suffix": "vm-mcore-sl7",
+    "accounting_fqan": "/atlas/Role=NULL/Capability=NULL",
+    "backoff_seconds": 600,
+    "fizzle_seconds": 600,
+    "heartbeat_file": "heartbeat",
+    "heartbeat_seconds": 600,
+    "machine_model": "cernvm3",
+    "min_wallclock_seconds": 260000,
+    "max_wallclock_seconds": 300000,
+    "min_processors": 8,
+    "max_processors": 8,
+    "root_image": "https://repo.gridpp.ac.uk/vacproject/atlas/cernvm4.iso",
+    "target_share": 0.0,
+    "user_data": "https://repo.gridpp.ac.uk/vacproject/atlas/user_data_SL7",
+    "user_data_proxy": "true"
+   },
+   {
+    "suffix": "vm-score",
+    "accounting_fqan": "/atlas/Role=NULL/Capability=NULL",
+    "backoff_seconds": 600,
+    "fizzle_seconds": 600,
+    "heartbeat_file": "heartbeat",
+    "heartbeat_seconds": 600,
+    "machine_model": "cernvm3",
+    "min_wallclock_seconds": 260000,
+    "max_wallclock_seconds": 300000,
+    "root_image": "https://repo.gridpp.ac.uk/vacproject/atlas/cernvm3.iso",
+    "target_share": 0.0,
+    "user_data": "https://repo.gridpp.ac.uk/vacproject/atlas/user_data",
+    "user_data_proxy": "true"
+   }
+  ]
+}
